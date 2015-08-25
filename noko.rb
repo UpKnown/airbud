@@ -5,7 +5,20 @@ class Noko
   attr_reader :url
 
   def initialize(url)
-    @url = url
+    @url = URI.decode(url)
+    @proxy_ips = [
+      "173.234.232.73:3128",
+      "170.130.62.25:3128",
+      "50.2.44.103:3128",
+      "173.234.249.159:3128",
+      "173.234.249.180:3128",
+      "173.234.232.10:3128",
+      "173.234.249.138:3128",
+      "173.234.249.53:3128",
+      "50.2.44.197:3128",
+      "170.130.62.125:3128"
+    ]
+    @user_agents = ["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_0) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.854.0 Safari/535.2"]
   end
 
   def formatted
@@ -20,7 +33,11 @@ class Noko
   end
 
   def content
-    content = Nokogiri::HTML.parse(open(url))  
+    content = Nokogiri::HTML(open(
+      url, 
+      'proxy' => @proxy_ips.sample,
+      'User-Agent' => @user_agents.sample
+    ))
     content.xpath('//script').remove
     content
   end
@@ -58,7 +75,6 @@ class Noko
         date: xp.css('.education-date').text
       }
     end
-
   end
 
   def skills
